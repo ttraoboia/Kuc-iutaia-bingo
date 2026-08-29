@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KUC IUTAIA TABUTOA - 90 Ball Bingo Caller</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f8efd7;color:#35152b;text-align:center}
+.wrap{max-width:1100px;margin:auto;padding:14px}
+h1{margin:5px 0;color:#7b003f;font-size:clamp(28px,5vw,58px);letter-spacing:2px}
+h2{margin:0 0 12px;color:white;background:#7b003f;padding:10px;border-radius:12px}
+.card{background:#fffaf0;border:5px solid #7b003f;border-radius:22px;padding:18px;box-shadow:0 6px 20px #0002}
+.big{font-size:clamp(90px,20vw,190px);font-weight:900;color:#7b003f;line-height:1;margin:10px auto}
+button{border:0;border-radius:14px;padding:16px 26px;font-size:22px;font-weight:900;cursor:pointer;background:#d49b00;color:white;box-shadow:0 5px 0 #8b6500}
+button:active{transform:translateY(3px);box-shadow:0 2px 0 #8b6500}
+button.secondary{background:#7b003f;box-shadow:0 5px 0 #4b0027;font-size:16px;padding:11px 18px}
+.status{font-size:22px;font-weight:bold;margin:8px}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin-top:15px}
+.num{background:#eee4d0;border-radius:8px;padding:9px 2px;font-weight:bold;font-size:18px}
+.num.called{background:#7b003f;color:white;box-shadow:inset 0 0 0 3px #e0aa21}
+.history{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin:12px 0;min-height:42px}
+.ball{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#7b003f;color:white;font-weight:bold}
+.small{font-size:14px;opacity:.8}
+.banner{margin:10px 0;background:#d49b00;color:white;border-radius:12px;padding:10px;font-size:24px;font-weight:900}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>KUC IUTAIA TABUTOA</h1>
+  <h2>NIKUNAU • 90-BALL ONLINE BINGO</h2>
+  <div class="card">
+    <div class="small">LAST NUMBER CALLED</div>
+    <div id="big" class="big">—</div>
+    <div id="status" class="status">Ready to start</div>
+    <button id="draw">🎱 DRAW NEXT NUMBER</button>
+    <button id="reset" class="secondary">RESET GAME</button>
+    <div class="banner">NUMBERS CALLED SO FAR</div>
+    <div id="history" class="history"></div>
+    <div id="grid" class="grid"></div>
+  </div>
+  <p class="small">Each number from 1–90 is drawn only once. Use “DRAW NEXT NUMBER” for the next call.</p>
+</div>
+
+<script>
+const numbers = Array.from({length:90}, (_,i)=>i+1);
+let remaining = [...numbers];
+let called = [];
+
+const big = document.getElementById('big');
+const status = document.getElementById('status');
+const history = document.getElementById('history');
+const grid = document.getElementById('grid');
+
+function renderGrid(){
+  grid.innerHTML='';
+  numbers.forEach(n=>{
+    const d=document.createElement('div');
+    d.className='num'+(called.includes(n)?' called':'');
+    d.textContent=n;
+    d.id='n'+n;
+    grid.appendChild(d);
+  });
+}
+function renderHistory(){
+  history.innerHTML='';
+  [...called].reverse().forEach(n=>{
+    const b=document.createElement('div');
+    b.className='ball'; b.textContent=n; history.appendChild(b);
+  });
+}
+function drawNext(){
+  if(remaining.length===0){
+    status.textContent='🎉 All 90 numbers have been called!';
+    return;
+  }
+  const i=Math.floor(Math.random()*remaining.length);
+  const n=remaining.splice(i,1)[0];
+  called.push(n);
+  big.textContent=n;
+  status.textContent='NUMBER '+n+' CALLED!';
+  renderGrid(); renderHistory();
+  if(remaining.length===0) status.textContent='🎉 NUMBER '+n+' — ALL 90 CALLED!';
+}
+function resetGame(){
+  if(!confirm('Reset the Bingo game and clear all called numbers?')) return;
+  remaining=[...numbers]; called=[]; big.textContent='—';
+  status.textContent='Ready to start'; renderGrid(); renderHistory();
+}
+document.getElementById('draw').onclick=drawNext;
+document.getElementById('reset').onclick=resetGame;
+document.addEventListener('keydown',e=>{ if(e.code==='Space'){e.preventDefault();drawNext()} });
+renderGrid(); renderHistory();
+</script>
+</body>
+</html>
